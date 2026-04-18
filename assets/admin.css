@@ -1,0 +1,91 @@
+/* GEO Optimizer — Admin Page Styles */
+
+.causabi-admin .causabi-tagline {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Score card */
+.causabi-score-card {
+    border-left: 4px solid #ccc;
+    padding: 20px 24px;
+    margin: 20px 0;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+    max-width: 600px;
+}
+.causabi-score-card.causabi-score-good  { border-left-color: #00a32a; }
+.causabi-score-card.causabi-score-medium { border-left-color: #dba617; }
+.causabi-score-card.causabi-score-poor  { border-left-color: #d63638; }
+
+.causabi-score-number {
+    font-size: 56px;
+    font-weight: 700;
+    line-height: 1;
+}
+.causabi-score-good  .causabi-score-number { color: #00a32a; }
+.causabi-score-medium .causabi-score-number { color: #dba617; }
+.causabi-score-poor  .causabi-score-number { color: #d63638; }
+
+.causabi-score-label {
+    font-size: 15px;
+    font-weight: 600;
+    margin: 6px 0 4px;
+    color: #1d2327;
+}
+.causabi-score-desc {
+    color: #666;
+    font-size: 13px;
+    margin: 0;
+}
+
+/* Breakdown table */
+.causabi-breakdown {
+    max-width: 800px;
+    margin: 0 0 24px;
+}
+.causabi-breakdown td {
+    vertical-align: top;
+    padding: 10px 12px;
+}
+.causabi-breakdown tr:nth-child(even) td {
+    background: #f9f9f9;
+}
+
+/* Issues list */
+.causabi-issues {
+    list-style: none;
+    margin: 0 0 24px;
+    padding: 0;
+    max-width: 700px;
+}
+.causabi-issue {
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    border-left: 3px solid #ccc;
+}
+.causabi-issue--critical { background: #fcf0f1; border-left-color: #d63638; }
+.causabi-issue--warning  { background: #fef8ee; border-left-color: #dba617; }
+.causabi-issue strong    { display: block; margin-bottom: 3px; }
+.causabi-issue span      { color: #555; font-size: 13px; }
+
+/* Onboarding */
+.causabi-onboarding {
+    background: #f0f6fc;
+    border: 1px solid #c5d9f0;
+    border-radius: 4px;
+    padding: 20px 24px;
+    max-width: 580px;
+    margin-bottom: 24px;
+}
+.causabi-steps {
+    margin: 12px 0 0 18px;
+    padding: 0;
+}
+.causabi-steps li {
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
