@@ -1,9 +1,9 @@
 === GEO Optimizer by Causabi ===
 Contributors: causabi
-Tags: schema, seo, ai, chatgpt, structured-data, json-ld, perplexity, ai-search
+Tags: schema, seo, ai, structured-data, ai-search
 Requires at least: 5.8
 Tested up to: 6.7
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,8 +20,9 @@ GEO Optimizer analyzes your site and automatically injects the markup that AI en
 
 **What it does:**
 
-* ✅ Adds **Organization Schema** — tells AI your business name, URL, and contact details
+* ✅ Adds **smart Schema.org markup** — correct type per business (Restaurant, CafeOrCoffeeShop, BankOrCreditUnion, and 40+ more), not just generic "Organization"
 * ✅ Adds **FAQ Schema** — research shows this boosts citation rate by up to **41%** in Perplexity
+* ✅ **Language-aware AI analysis** — RU sites get Russian FAQ and markup, EN sites get English
 * ✅ Shows your **AI Readiness Score** (0–100) with a full breakdown
 * ✅ Identifies exactly which issues are hurting your AI visibility
 * ✅ Auto-refreshes your markup every 7 days to stay current
@@ -74,6 +75,21 @@ Most Schema plugins require you to manually fill in all your business details. G
 
 Only positively. Schema.org markup is recommended by Google and all major search engines. It doesn't interfere with any existing SEO plugins.
 
+== External Services ==
+
+This plugin connects to the **Causabi API** (`https://ai.causabi.com`) to analyze your website and generate AI-optimized Schema.org markup.
+
+**What data is sent:** Your website URL and domain name.
+
+**When it is sent:**
+* When you first save your API key and the plugin performs its initial analysis
+* When you click "Refresh Now" in the settings page
+* Automatically every 7 days via WP-Cron to keep your markup current
+
+No personal data of your site visitors is ever sent to Causabi.
+
+This service is provided by Causabi. By using this plugin you agree to their [Terms of Service](https://causabi.com/terms) and [Privacy Policy](https://causabi.com/privacy).
+
 == Screenshots ==
 
 1. AI Readiness Score dashboard — see your score and breakdown by category
@@ -84,10 +100,20 @@ Only positively. Schema.org markup is recommended by Google and all major search
 
 == Changelog ==
 
+= 1.1.0 =
+* Smart schema.org type detection — 40+ business types (Restaurant, CafeOrCoffeeShop, BankOrCreditUnion, NewsMediaOrganization, etc.)
+* Language-aware generation — Russian sites get Russian FAQ and markup, English sites get English
+* AI citation monitoring added to Pro plan (ChatGPT, Gemini, Grok)
+* Multi-source reviews: Google, Yandex, 2GIS, TripAdvisor
+* Improved AI profile generation accuracy
+
 = 1.0.0 =
 * Initial release
 
 == Upgrade Notice ==
+
+= 1.1.0 =
+Major quality improvement: smarter schema.org types and language-aware FAQ generation. Upgrade recommended.
 
 = 1.0.0 =
 Initial release.
