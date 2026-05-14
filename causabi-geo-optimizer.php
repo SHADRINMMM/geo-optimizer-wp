@@ -5,7 +5,7 @@
  * Description:       Make your website visible to ChatGPT, Perplexity, and other AI search engines. Automatically adds Schema.org markup and shows your AI Readiness Score in the dashboard.
  * Version:           1.1.0
  * Requires at least: 5.8
- * Requires PHP:      7.4
+ * Requires PHP:      8.1
  * Author:            Causabi
  * Author URI:        https://causabi.com
  * License:           GPL v2 or later
