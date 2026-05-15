@@ -28,7 +28,9 @@ class Causabi_Admin_Page {
     public function register_settings(): void {
         register_setting( 'causabi_options', 'causabi_api_key', [
             'type'              => 'string',
-            'sanitize_callback' => 'sanitize_text_field',
+            'sanitize_callback' => function ( $value ) {
+                return Causabi_Crypto::encrypt( sanitize_text_field( $value ) );
+            },
             'default'           => '',
         ] );
 
@@ -44,7 +46,8 @@ class Causabi_Admin_Page {
     }
 
     public function render_api_key_field(): void {
-        $value = get_option( 'causabi_api_key', '' );
+        $stored = get_option( 'causabi_api_key', '' );
+        $value  = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
         echo '<input type="text" name="causabi_api_key" value="' . esc_attr( $value ) . '" class="regular-text" placeholder="causabi_..." />';
         echo '<p class="description">' . sprintf(
             /* translators: %s: link to causabi.com */
@@ -56,7 +59,8 @@ class Causabi_Admin_Page {
     public function render_page(): void {
         if ( ! current_user_can( 'manage_options' ) ) return;
 
-        $api_key = get_option( 'causabi_api_key', '' );
+        $stored  = get_option( 'causabi_api_key', '' );
+        $api_key = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
         $data    = get_transient( $this->cache_key() );
         ?>
         <div class="wrap causabi-admin">
@@ -84,7 +88,7 @@ class Causabi_Admin_Page {
 
             <?php endif; ?>
 
-            <hr style="margin:30px 0">
+            <hr class="causabi-settings-divider">
             <h2><?php esc_html_e( 'Settings', 'causabi-geo-optimizer' ); ?></h2>
             <form method="post" action="options.php">
                 <?php
@@ -103,7 +107,7 @@ class Causabi_Admin_Page {
         $class = $score >= 80 ? 'good' : ( $score >= 50 ? 'medium' : 'poor' );
         ?>
         <div class="causabi-score-card causabi-score-<?php echo esc_attr( $class ); ?>">
-            <div class="causabi-score-number"><?php echo $score; ?>/100</div>
+            <div class="causabi-score-number"><?php echo (int) $score; ?>/100</div>
             <div class="causabi-score-label">
                 <?php esc_html_e( 'AI Readiness Score', 'causabi-geo-optimizer' ); ?>
                 &nbsp;—&nbsp; <?php esc_html_e( 'Grade', 'causabi-geo-optimizer' ); ?> <?php echo $grade; ?>
@@ -156,7 +160,7 @@ class Causabi_Admin_Page {
             <thead>
                 <tr>
                     <th><?php esc_html_e( 'Category', 'causabi-geo-optimizer' ); ?></th>
-                    <th style="width:80px"><?php esc_html_e( 'Score', 'causabi-geo-optimizer' ); ?></th>
+                    <th class="causabi-col-score"><?php esc_html_e( 'Score', 'causabi-geo-optimizer' ); ?></th>
                     <th><?php esc_html_e( 'What it means for your visibility', 'causabi-geo-optimizer' ); ?></th>
                 </tr>
             </thead>
@@ -167,7 +171,7 @@ class Causabi_Admin_Page {
                 ?>
                 <tr>
                     <td><strong><?php echo $icon . ' ' . esc_html( $label ); ?></strong></td>
-                    <td><?php echo $val . '/' . $max; ?></td>
+                    <td><?php echo (int) $val . '/' . (int) $max; ?></td>
                     <td><?php echo esc_html( $desc ); ?></td>
                 </tr>
                 <?php endforeach; ?>
@@ -201,11 +205,11 @@ class Causabi_Admin_Page {
     private function render_refresh_button( array $data ): void {
         $scanned = esc_html( $data['scanned_at'] ?? '' );
         ?>
-        <p style="margin-top:20px">
+        <p class="causabi-refresh-row">
             <button id="causabi-refresh-btn" class="button button-primary">
                 <?php esc_html_e( 'Refresh Now', 'causabi-geo-optimizer' ); ?>
             </button>
-            <span id="causabi-refresh-status" style="margin-left:10px"></span>
+            <span id="causabi-refresh-status" class="causabi-refresh-status"></span>
         </p>
         <p><small>
             <?php
@@ -285,8 +289,17 @@ class Causabi_Admin_Page {
             wp_send_json_error( 'Insufficient permissions' );
         }
 
-        $api_key = get_option( 'causabi_api_key', '' );
+        $lock_key = 'causabi_refreshing_' . get_current_user_id();
+        if ( get_transient( $lock_key ) ) {
+            wp_send_json_error( [ 'message' => __( 'Already refreshing. Please wait.', 'causabi-geo-optimizer' ) ] );
+            return;
+        }
+        set_transient( $lock_key, 1, 60 );
+
+        $stored  = get_option( 'causabi_api_key', '' );
+        $api_key = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
         if ( ! $api_key ) {
+            delete_transient( $lock_key );
             wp_send_json_error( 'API key not configured' );
         }
 
@@ -298,10 +311,12 @@ class Causabi_Admin_Page {
         $data   = $client->analyze( get_site_url(), $domain );
 
         if ( ! $data ) {
+            delete_transient( $lock_key );
             wp_send_json_error( 'Could not reach Causabi API. Please try again.' );
         }
 
         set_transient( $cache_key, $data, DAY_IN_SECONDS );
+        delete_transient( $lock_key );
         wp_send_json_success( [ 'score' => $data['score'], 'grade' => $data['grade'] ] );
     }
 

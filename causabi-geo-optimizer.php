@@ -21,6 +21,7 @@ define( 'CAUSABI_API_URL',    'https://ai.causabi.com' );
 define( 'CAUSABI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CAUSABI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 
+require_once CAUSABI_PLUGIN_DIR . 'includes/class-crypto.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-api-client.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-schema-injector.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-admin-page.php';
@@ -34,7 +35,8 @@ add_action( 'plugins_loaded', function () {
 
 // Inject Schema.org into <head> on every page load
 function causabi_init(): void {
-    $api_key = get_option( 'causabi_api_key', '' );
+    $stored  = get_option( 'causabi_api_key', '' );
+    $api_key = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
     if ( ! $api_key ) return;
 
     $injector = new Causabi_Schema_Injector( $api_key );
