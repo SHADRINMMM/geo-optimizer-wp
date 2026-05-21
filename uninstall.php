@@ -11,14 +11,14 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 delete_option( 'causabi_api_key' );
 
 // Remove cached analysis data (transient key is causabi_data_{md5(domain)})
-$host      = wp_parse_url( get_site_url(), PHP_URL_HOST ) ?? '';
-$domain    = str_replace( 'www.', '', strtolower( $host ) );
-$cache_key = 'causabi_data_' . md5( $domain );
-delete_transient( $cache_key );
+$causabi_host      = wp_parse_url( get_site_url(), PHP_URL_HOST ) ?? '';
+$causabi_domain    = str_replace( 'www.', '', strtolower( $causabi_host ) );
+$causabi_cache_key = 'causabi_data_' . md5( $causabi_domain );
+delete_transient( $causabi_cache_key );
 delete_transient( 'causabi_scan_queued' );
 
 // Remove scheduled cron event
-$timestamp = wp_next_scheduled( 'causabi_refresh_schema' );
-if ( $timestamp ) {
-    wp_unschedule_event( $timestamp, 'causabi_refresh_schema' );
+$causabi_timestamp = wp_next_scheduled( 'causabi_refresh_schema' );
+if ( $causabi_timestamp ) {
+    wp_unschedule_event( $causabi_timestamp, 'causabi_refresh_schema' );
 }

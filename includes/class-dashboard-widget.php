@@ -44,7 +44,7 @@ class Causabi_Dashboard_Widget {
         }
 
         $score = intval( $data['score'] ?? 0 );
-        $grade = esc_html( $data['grade'] ?? '?' );
+        $grade = $data['grade'] ?? '?';
         $class = $score >= 80 ? 'good' : ( $score >= 50 ? 'medium' : 'poor' );
 
         $schema_active = ! empty( $data['schema_json'] );
@@ -61,7 +61,7 @@ class Causabi_Dashboard_Widget {
             '<div class="causabi-widget-label">%s — %s %s</div>',
             esc_html__( 'AI Readiness Score', 'causabi-geo-optimizer' ),
             esc_html__( 'Grade', 'causabi-geo-optimizer' ),
-            $grade
+            esc_html( $grade )
         );
         echo '</div>';
 
@@ -82,7 +82,7 @@ class Causabi_Dashboard_Widget {
             echo '<li>⚠️ ' . sprintf(
                 /* translators: %d: number of issues */
                 esc_html( _n( '%d issue to fix', '%d issues to fix', $issues_count, 'causabi-geo-optimizer' ) ),
-                $issues_count
+                (int) $issues_count
             ) . '</li>';
         }
         echo '</ul>';

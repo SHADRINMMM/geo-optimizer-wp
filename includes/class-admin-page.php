@@ -103,14 +103,14 @@ class Causabi_Admin_Page {
 
     private function render_score_card( array $data ): void {
         $score = intval( $data['score'] ?? 0 );
-        $grade = esc_html( $data['grade'] ?? '?' );
+        $grade = $data['grade'] ?? '?';
         $class = $score >= 80 ? 'good' : ( $score >= 50 ? 'medium' : 'poor' );
         ?>
         <div class="causabi-score-card causabi-score-<?php echo esc_attr( $class ); ?>">
             <div class="causabi-score-number"><?php echo (int) $score; ?>/100</div>
             <div class="causabi-score-label">
                 <?php esc_html_e( 'AI Readiness Score', 'causabi-geo-optimizer' ); ?>
-                &nbsp;—&nbsp; <?php esc_html_e( 'Grade', 'causabi-geo-optimizer' ); ?> <?php echo $grade; ?>
+                &nbsp;—&nbsp; <?php esc_html_e( 'Grade', 'causabi-geo-optimizer' ); ?> <?php echo esc_html( $grade ); ?>
             </div>
             <p class="causabi-score-desc">
                 <?php esc_html_e( 'This score shows how easily ChatGPT, Gemini, Grok, Claude, and other AI search engines can find, understand, and cite your website.', 'causabi-geo-optimizer' ); ?>
@@ -167,10 +167,10 @@ class Causabi_Admin_Page {
             <tbody>
                 <?php foreach ( $labels as $key => [ $label, $desc, $max ] ) :
                     $val  = intval( $data['breakdown'][ $key ] ?? 0 );
-                    $icon = $val >= $max ? '✅' : ( $val > 0 ? '⚠️' : '❌' );
+                    $icon = esc_html( $val >= $max ? '✅' : ( $val > 0 ? '⚠️' : '❌' ) );
                 ?>
                 <tr>
-                    <td><strong><?php echo $icon . ' ' . esc_html( $label ); ?></strong></td>
+                    <td><strong><?php echo esc_html( $icon ) . ' ' . esc_html( $label ); ?></strong></td>
                     <td><?php echo (int) $val . '/' . (int) $max; ?></td>
                     <td><?php echo esc_html( $desc ); ?></td>
                 </tr>
@@ -190,11 +190,11 @@ class Causabi_Admin_Page {
         <p><?php esc_html_e( 'Fixing these issues will increase how often your site appears in ChatGPT, Gemini, Grok, and Claude answers.', 'causabi-geo-optimizer' ); ?></p>
         <ul class="causabi-issues">
             <?php foreach ( $data['issues'] as $issue ) :
-                $severity = esc_attr( $issue['severity'] ?? 'warning' );
-                $icon     = $severity === 'critical' ? '❌' : '⚠️';
+                $severity = sanitize_key( $issue['severity'] ?? 'warning' );
+                $icon     = esc_html( 'critical' === $severity ? '❌' : '⚠️' );
             ?>
-            <li class="causabi-issue causabi-issue--<?php echo $severity; ?>">
-                <strong><?php echo $icon . ' ' . esc_html( $issue['title'] ?? '' ); ?></strong>
+            <li class="causabi-issue causabi-issue--<?php echo esc_attr( $severity ); ?>">
+                <strong><?php echo esc_html( $icon ) . ' ' . esc_html( $issue['title'] ?? '' ); ?></strong>
                 <span><?php echo esc_html( $issue['description'] ?? '' ); ?></span>
             </li>
             <?php endforeach; ?>
@@ -203,7 +203,7 @@ class Causabi_Admin_Page {
     }
 
     private function render_refresh_button( array $data ): void {
-        $scanned = esc_html( $data['scanned_at'] ?? '' );
+        $scanned = $data['scanned_at'] ?? '';
         ?>
         <p class="causabi-refresh-row">
             <button id="causabi-refresh-btn" class="button button-primary">
@@ -216,7 +216,7 @@ class Causabi_Admin_Page {
             printf(
                 /* translators: %s: scan timestamp */
                 esc_html__( 'Last scan: %s. Auto-refreshes every 7 days.', 'causabi-geo-optimizer' ),
-                $scanned
+                esc_html( $scanned )
             );
             ?>
         </small></p>
