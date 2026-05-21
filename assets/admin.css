@@ -89,3 +89,19 @@
     margin-bottom: 12px;
     line-height: 1.5;
 }
+
+/* Settings page extras */
+.causabi-settings-divider { margin: 30px 0; }
+.causabi-refresh-row      { margin-top: 20px; }
+.causabi-refresh-status   { margin-left: 10px; }
+.causabi-breakdown th.causabi-col-score { width: 80px; }
+
+/* Dashboard Widget */
+.causabi-widget-center { text-align: center; padding: 8px 0 12px; }
+.causabi-widget-score  { font-size: 52px; font-weight: 700; line-height: 1; }
+.causabi-widget-score--good   { color: #00a32a; }
+.causabi-widget-score--medium { color: #dba617; }
+.causabi-widget-score--poor   { color: #d63638; }
+.causabi-widget-label  { color: #666; font-size: 13px; margin-top: 4px; }
+.causabi-widget-list   { margin: 0; padding: 0 0 0 4px; list-style: none; font-size: 13px; }
+.causabi-widget-footer { margin: 12px 0 0; text-align: center; }

@@ -8,20 +8,20 @@ Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Make your website visible to ChatGPT, Perplexity, Gemini, and other AI search engines — automatically.
+Make your website visible to ChatGPT, Gemini, Grok, Claude, and other AI search engines — automatically.
 
 == Description ==
 
 **73% of websites are invisible to AI search engines.** This plugin fixes that in minutes — no coding required.
 
-When someone asks ChatGPT or Perplexity a question, the AI picks websites to cite from. If your site is missing the right structured data, it gets skipped — even if your content is great.
+When someone asks ChatGPT, Gemini, or Grok a question, the AI picks websites to cite from. If your site is missing the right structured data, it gets skipped — even if your content is great.
 
 GEO Optimizer analyzes your site and automatically injects the markup that AI engines look for:
 
 **What it does:**
 
 * ✅ Adds **smart Schema.org markup** — correct type per business (Restaurant, CafeOrCoffeeShop, BankOrCreditUnion, and 40+ more), not just generic "Organization"
-* ✅ Adds **FAQ Schema** — research shows this boosts citation rate by up to **41%** in Perplexity
+* ✅ Adds **FAQ Schema** — research shows this boosts AI citation rate by up to **41%**
 * ✅ **Language-aware AI analysis** — RU sites get Russian FAQ and markup, EN sites get English
 * ✅ Shows your **AI Readiness Score** (0–100) with a full breakdown
 * ✅ Identifies exactly which issues are hurting your AI visibility
@@ -37,7 +37,7 @@ GEO Optimizer analyzes your site and automatically injects the markup that AI en
 
 **What is GEO?**
 
-GEO (Generative Engine Optimization) is the practice of optimizing your website so that AI search engines like ChatGPT, Perplexity, and Google's AI Overview cite your content in their answers. It's like SEO, but for the AI era.
+GEO (Generative Engine Optimization) is the practice of optimizing your website so that AI search engines like ChatGPT, Gemini, Grok, and Google's AI Overview cite your content in their answers. It's like SEO, but for the AI era.
 
 **Free to use.** Get your API key at [causabi.com](https://causabi.com).
 
@@ -53,7 +53,7 @@ GEO (Generative Engine Optimization) is the practice of optimizing your website 
 
 = What is an AI Readiness Score? =
 
-It's a score from 0 to 100 that measures how well ChatGPT, Perplexity, Gemini, and other AI search engines can find, understand, and cite your website. A higher score means more chances of appearing in AI-generated answers.
+It's a score from 0 to 100 that measures how well ChatGPT, Gemini, Grok, Claude, and other AI search engines can find, understand, and cite your website. A higher score means more chances of appearing in AI-generated answers.
 
 = Does this plugin slow down my site? =
 

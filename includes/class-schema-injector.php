@@ -24,15 +24,8 @@ class Causabi_Schema_Injector {
         $cache_key = 'causabi_data_' . md5( $domain );
         $data      = get_transient( $cache_key );
 
-        if ( $data === false ) {
-            $client = new Causabi_API_Client( $this->api_key );
-            $data   = $client->analyze( get_site_url(), $domain );
-
-            if ( $data ) {
-                set_transient( $cache_key, $data, self::CACHE_TTL );
-            }
-        }
-
+        // Never make HTTP requests on the frontend — only serve from cache.
+        // Initial population happens via admin save / Refresh button / WP-Cron.
         if ( empty( $data ) ) return;
 
         // Organization / WebSite schema — injected on every page

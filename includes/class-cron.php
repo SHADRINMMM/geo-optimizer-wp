@@ -28,7 +28,8 @@ class Causabi_Cron {
      * Clears the transient — next wp_head call will fetch fresh data from API.
      */
     public static function refresh(): void {
-        $api_key = get_option( 'causabi_api_key', '' );
+        $stored  = get_option( 'causabi_api_key', '' );
+        $api_key = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
         if ( ! $api_key ) return;
 
         $host      = wp_parse_url( get_site_url(), PHP_URL_HOST ) ?? '';

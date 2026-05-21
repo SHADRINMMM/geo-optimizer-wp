@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>WP Admin — AI Score Widget</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "Segoe UI", sans-serif; background: #f0f0f1; color: #1d2327; font-size: 13px; }
+
+  /* WP Admin chrome */
+  .wp-admin { display: flex; min-height: 100vh; }
+  .wp-sidebar { width: 160px; background: #1d2327; flex-shrink: 0; }
+  .wp-sidebar-header { padding: 16px 12px; border-bottom: 1px solid #2c3338; }
+  .wp-sidebar-header .logo { color: #a7aaad; font-size: 20px; }
+  .wp-sidebar-menu { padding: 8px 0; }
+  .wp-sidebar-item { padding: 8px 12px; color: #a7aaad; font-size: 13px; cursor: pointer; border-left: 3px solid transparent; }
+  .wp-sidebar-item.active { color: #fff; background: #2c3338; border-left-color: #2271b1; }
+  .wp-sidebar-item + .wp-sidebar-item { margin-top: 1px; }
+
+  .wp-main { flex: 1; display: flex; flex-direction: column; }
+  .wp-topbar { background: #1d2327; height: 32px; display: flex; align-items: center; padding: 0 16px; border-bottom: 1px solid #3c434a; }
+  .wp-topbar-logo { color: #a7aaad; font-size: 18px; margin-right: 16px; }
+  .wp-topbar-items { display: flex; gap: 16px; }
+  .wp-topbar-item { color: #a7aaad; font-size: 12px; }
+  .wp-topbar-right { margin-left: auto; color: #a7aaad; font-size: 12px; }
+
+  .wp-content { padding: 20px; flex: 1; }
+  .wp-page-title { font-size: 23px; font-weight: 400; color: #1d2327; margin-bottom: 20px; }
+
+  /* Dashboard widgets grid */
+  .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .dashboard-col { display: flex; flex-direction: column; gap: 16px; }
+
+  /* Generic WP widget */
+  .wp-widget { background: #fff; border: 1px solid #c3c4c7; border-top: 4px solid #c3c4c7; border-radius: 0; }
+  .wp-widget-header { padding: 10px 12px; border-bottom: 1px solid #c3c4c7; font-size: 14px; font-weight: 600; color: #1d2327; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+  .wp-widget-body { padding: 16px; }
+  .wp-widget-item { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #f0f0f1; font-size: 12px; }
+  .wp-widget-item:last-child { border-bottom: none; }
+  .wp-widget-item-label { color: #646970; }
+  .wp-widget-item-value { font-weight: 600; color: #1d2327; }
+
+  /* ── CAUSABI WIDGET ── */
+  .causabi-widget { background: #fff; border: 1px solid #c3c4c7; border-top: 4px solid #2271b1; border-radius: 2px; overflow: hidden; }
+  .causabi-widget-header { padding: 10px 12px; border-bottom: 1px solid #e0e0e0; font-size: 14px; font-weight: 600; color: #1d2327; display: flex; align-items: center; gap: 8px; }
+  .causabi-logo { width: 18px; height: 18px; background: #2271b1; border-radius: 3px; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 10px; font-weight: 700; font-family: monospace; }
+  .causabi-widget-body { padding: 16px; }
+
+  /* Score ring */
+  .score-hero { display: flex; align-items: center; gap: 20px; margin-bottom: 16px; }
+  .score-ring-wrap { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
+  .score-ring-wrap svg { transform: rotate(-90deg); }
+  .score-ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .score-ring-number { font-size: 26px; font-weight: 700; color: #1d2327; line-height: 1; }
+  .score-ring-label { font-size: 10px; color: #646970; margin-top: 2px; }
+  .score-grade { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #d63638; color: #fff; font-weight: 700; font-size: 14px; border-radius: 50%; margin-top: 4px; }
+  .score-grade.good { background: #00a32a; }
+  .score-grade.warn { background: #dba617; color: #fff; }
+
+  .score-meta { flex: 1; }
+  .score-meta-title { font-size: 15px; font-weight: 600; color: #1d2327; margin-bottom: 4px; }
+  .score-meta-domain { font-size: 12px; color: #646970; margin-bottom: 8px; }
+  .score-meta-updated { font-size: 11px; color: #8c8f94; }
+  .score-meta-badge { display: inline-flex; align-items: center; gap: 4px; background: #d63638; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; margin-top: 6px; }
+  .score-meta-badge.good { background: #00a32a; }
+
+  /* Breakdown bars */
+  .breakdown { margin-bottom: 16px; }
+  .breakdown-title { font-size: 12px; font-weight: 600; color: #1d2327; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .breakdown-item { margin-bottom: 8px; }
+  .breakdown-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+  .breakdown-label { font-size: 12px; color: #646970; }
+  .breakdown-val { font-size: 12px; font-weight: 600; }
+  .breakdown-val.bad { color: #d63638; }
+  .breakdown-val.warn { color: #dba617; }
+  .breakdown-val.good { color: #00a32a; }
+  .bar-track { height: 5px; background: #f0f0f1; border-radius: 3px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+  .bar-fill.bad { background: #d63638; }
+  .bar-fill.warn { background: #dba617; }
+  .bar-fill.good { background: #00a32a; }
+
+  /* Issues list */
+  .issues { margin-bottom: 16px; }
+  .issues-title { font-size: 12px; font-weight: 600; color: #1d2327; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .issue-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 10px; border-radius: 3px; margin-bottom: 5px; }
+  .issue-item.error { background: #fcf0f1; border-left: 3px solid #d63638; }
+  .issue-item.warning { background: #fcf9e8; border-left: 3px solid #dba617; }
+  .issue-item.success { background: #edfaef; border-left: 3px solid #00a32a; }
+  .issue-icon { font-size: 13px; margin-top: 1px; }
+  .issue-text { font-size: 12px; color: #1d2327; line-height: 1.4; }
+  .issue-text strong { font-weight: 600; }
+
+  /* CTA buttons */
+  .causabi-actions { display: flex; gap: 8px; }
+  .btn-wp-primary { padding: 6px 14px; background: #2271b1; color: #fff; border: none; border-radius: 3px; font-size: 13px; font-weight: 600; cursor: pointer; }
+  .btn-wp-secondary { padding: 6px 14px; background: #fff; color: #1d2327; border: 1px solid #c3c4c7; border-radius: 3px; font-size: 13px; cursor: pointer; }
+  .btn-wp-fix { padding: 6px 14px; background: #00a32a; color: #fff; border: none; border-radius: 3px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+
+  .wp-notice { background: #fff; border-left: 4px solid #2271b1; padding: 10px 14px; font-size: 13px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .wp-notice .icon { font-size: 16px; }
+</style>
+</head>
+<body>
+<div class="wp-admin">
+  <!-- Sidebar -->
+  <div class="wp-sidebar">
+    <div class="wp-sidebar-header"><span class="logo">⊕</span></div>
+    <div class="wp-sidebar-menu">
+      <div class="wp-sidebar-item active">Dashboard</div>
+      <div class="wp-sidebar-item">Posts</div>
+      <div class="wp-sidebar-item">Pages</div>
+      <div class="wp-sidebar-item">Plugins</div>
+      <div class="wp-sidebar-item" style="color:#72aee6;border-left-color:#72aee6">GEO Optimizer</div>
+      <div class="wp-sidebar-item">Settings</div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="wp-main">
+    <div class="wp-topbar">
+      <span class="wp-topbar-logo">⊕</span>
+      <div class="wp-topbar-items">
+        <span class="wp-topbar-item">+New</span>
+        <span class="wp-topbar-item">1 update</span>
+      </div>
+      <div class="wp-topbar-right">Howdy, admin</div>
+    </div>
+
+    <div class="wp-content">
+      <h1 class="wp-page-title">Dashboard</h1>
+
+      <div class="wp-notice">
+        <span class="icon">🔔</span>
+        <span><strong>Causabi GEO Optimizer:</strong> Your AI Score dropped from 87 to 68. New issues detected — <a href="#" style="color:#2271b1">view details</a>.</span>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-col">
+
+          <!-- CAUSABI MAIN WIDGET -->
+          <div class="causabi-widget">
+            <div class="causabi-widget-header">
+              <span class="causabi-logo">G</span>
+              Causabi GEO Optimizer
+              <span style="margin-left:auto;font-size:11px;color:#8c8f94;font-weight:400">causabi.com</span>
+            </div>
+            <div class="causabi-widget-body">
+
+              <div class="score-hero">
+                <div class="score-ring-wrap">
+                  <svg width="88" height="88" viewBox="0 0 88 88">
+                    <circle cx="44" cy="44" r="36" fill="none" stroke="#f0f0f1" stroke-width="8"/>
+                    <circle cx="44" cy="44" r="36" fill="none" stroke="#d63638" stroke-width="8"
+                      stroke-dasharray="226" stroke-dashoffset="72" stroke-linecap="round"/>
+                  </svg>
+                  <div class="score-ring-center">
+                    <div class="score-ring-number">68</div>
+                    <div class="score-ring-label">/100</div>
+                    <div class="score-grade warn">C</div>
+                  </div>
+                </div>
+                <div class="score-meta">
+                  <div class="score-meta-title">AI Readiness Score</div>
+                  <div class="score-meta-domain">mybusiness.com</div>
+                  <div class="score-meta-badge">⚠ 3 critical issues</div>
+                  <div class="score-meta-updated" style="margin-top:6px">Last scan: 2 hours ago</div>
+                </div>
+              </div>
+
+              <div class="breakdown">
+                <div class="breakdown-title">Score Breakdown</div>
+                <div class="breakdown-item">
+                  <div class="breakdown-row">
+                    <span class="breakdown-label">Schema markup</span>
+                    <span class="breakdown-val warn">14/25</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill warn" style="width:56%"></div></div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-row">
+                    <span class="breakdown-label">FAQ content</span>
+                    <span class="breakdown-val bad">4/20</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill bad" style="width:20%"></div></div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-row">
+                    <span class="breakdown-label">robots.txt</span>
+                    <span class="breakdown-val good">15/15</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill good" style="width:100%"></div></div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-row">
+                    <span class="breakdown-label">Content quality</span>
+                    <span class="breakdown-val warn">9/15</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill warn" style="width:60%"></div></div>
+                </div>
+                <div class="breakdown-item">
+                  <div class="breakdown-row">
+                    <span class="breakdown-label">llms.txt</span>
+                    <span class="breakdown-val bad">0/5</span>
+                  </div>
+                  <div class="bar-track"><div class="bar-fill bad" style="width:0%"></div></div>
+                </div>
+              </div>
+
+              <div class="issues">
+                <div class="issues-title">Top Issues</div>
+                <div class="issue-item error">
+                  <span class="issue-icon">✗</span>
+                  <div class="issue-text"><strong>FAQ Schema missing</strong> — Add FAQPage JSON-LD to increase ChatGPT citation rate by +41%</div>
+                </div>
+                <div class="issue-item error">
+                  <span class="issue-icon">✗</span>
+                  <div class="issue-text"><strong>llms.txt not found</strong> — AI agents cannot discover your site structure</div>
+                </div>
+                <div class="issue-item warning">
+                  <span class="issue-icon">!</span>
+                  <div class="issue-text"><strong>Organization Schema incomplete</strong> — Missing: foundingDate, numberOfEmployees, address</div>
+                </div>
+                <div class="issue-item success">
+                  <span class="issue-icon">✓</span>
+                  <div class="issue-text"><strong>robots.txt fixed</strong> — GPTBot, ClaudeBot, PerplexityBot allowed</div>
+                </div>
+              </div>
+
+              <div class="causabi-actions">
+                <button class="btn-wp-fix">⚡ Fix All Issues</button>
+                <button class="btn-wp-secondary">View Full Report</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right column — standard WP widgets (filler) -->
+        <div class="dashboard-col">
+          <div class="wp-widget">
+            <div class="wp-widget-header">At a Glance <span>▲</span></div>
+            <div class="wp-widget-body">
+              <div class="wp-widget-item"><span class="wp-widget-item-label">Posts</span><span class="wp-widget-item-value">42</span></div>
+              <div class="wp-widget-item"><span class="wp-widget-item-label">Pages</span><span class="wp-widget-item-value">8</span></div>
+              <div class="wp-widget-item"><span class="wp-widget-item-label">Comments</span><span class="wp-widget-item-value">15</span></div>
+            </div>
+          </div>
+          <div class="wp-widget">
+            <div class="wp-widget-header">Quick Draft <span>▲</span></div>
+            <div class="wp-widget-body" style="color:#646970;font-size:12px">Write a quick post...</div>
+          </div>
+          <div class="wp-widget">
+            <div class="wp-widget-header">Activity <span>▲</span></div>
+            <div class="wp-widget-body">
+              <div class="wp-widget-item"><span class="wp-widget-item-label">Published today</span><span class="wp-widget-item-value">2</span></div>
+              <div class="wp-widget-item"><span class="wp-widget-item-label">Drafts</span><span class="wp-widget-item-value">3</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

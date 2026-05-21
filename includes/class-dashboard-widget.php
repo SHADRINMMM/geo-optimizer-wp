@@ -15,6 +15,16 @@ class Causabi_Dashboard_Widget {
         );
     }
 
+    public function enqueue_styles( string $hook ): void {
+        if ( $hook !== 'index.php' ) return;
+        wp_enqueue_style(
+            'causabi-admin',
+            CAUSABI_PLUGIN_URL . 'assets/admin.css',
+            [],
+            CAUSABI_VERSION
+        );
+    }
+
     public function render(): void {
         $api_key = get_option( 'causabi_api_key', '' );
 
@@ -35,28 +45,28 @@ class Causabi_Dashboard_Widget {
 
         $score = intval( $data['score'] ?? 0 );
         $grade = esc_html( $data['grade'] ?? '?' );
-        $color = $score >= 80 ? '#00a32a' : ( $score >= 50 ? '#dba617' : '#d63638' );
+        $class = $score >= 80 ? 'good' : ( $score >= 50 ? 'medium' : 'poor' );
 
         $schema_active = ! empty( $data['schema_json'] );
         $faq_active    = ! empty( $data['faq_json'] );
         $issues_count  = count( $data['issues'] ?? [] );
 
-        echo '<div style="text-align:center;padding:8px 0 12px">';
+        echo '<div class="causabi-widget-center">';
         printf(
-            '<div style="font-size:52px;font-weight:700;color:%s;line-height:1">%d</div>',
-            esc_attr( $color ),
-            $score
+            '<div class="causabi-widget-score causabi-widget-score--%s">%d</div>',
+            esc_attr( $class ),
+            (int) $score
         );
         printf(
-            '<div style="color:#666;font-size:13px;margin-top:4px">%s — %s %s</div>',
+            '<div class="causabi-widget-label">%s — %s %s</div>',
             esc_html__( 'AI Readiness Score', 'causabi-geo-optimizer' ),
             esc_html__( 'Grade', 'causabi-geo-optimizer' ),
             $grade
         );
         echo '</div>';
 
-        echo '<hr style="margin:8px 0">';
-        echo '<ul style="margin:0;padding:0 0 0 4px;list-style:none;font-size:13px">';
+        echo '<hr>';
+        echo '<ul class="causabi-widget-list">';
 
         if ( $schema_active ) {
             echo '<li>✅ ' . esc_html__( 'Schema.org active', 'causabi-geo-optimizer' ) . '</li>';
@@ -78,7 +88,7 @@ class Causabi_Dashboard_Widget {
         echo '</ul>';
 
         printf(
-            '<p style="margin:12px 0 0;text-align:center"><a href="%s" class="button">%s</a></p>',
+            '<p class="causabi-widget-footer"><a href="%s" class="button">%s</a></p>',
             esc_url( admin_url( 'options-general.php?page=causabi-geo-optimizer' ) ),
             esc_html__( 'View full report →', 'causabi-geo-optimizer' )
         );

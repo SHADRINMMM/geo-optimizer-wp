@@ -65,7 +65,7 @@ class Causabi_Admin_Page {
         ?>
         <div class="wrap causabi-admin">
             <h1><?php esc_html_e( 'GEO Optimizer by Causabi', 'causabi-geo-optimizer' ); ?></h1>
-            <p class="causabi-tagline"><?php esc_html_e( 'Make your website visible to ChatGPT, Perplexity, and other AI search engines.', 'causabi-geo-optimizer' ); ?></p>
+            <p class="causabi-tagline"><?php esc_html_e( 'Make your website visible to ChatGPT, Gemini, Grok, Claude, and other AI search engines.', 'causabi-geo-optimizer' ); ?></p>
 
             <?php if ( $api_key && $data ) : ?>
 
@@ -113,7 +113,7 @@ class Causabi_Admin_Page {
                 &nbsp;—&nbsp; <?php esc_html_e( 'Grade', 'causabi-geo-optimizer' ); ?> <?php echo $grade; ?>
             </div>
             <p class="causabi-score-desc">
-                <?php esc_html_e( 'This score shows how easily ChatGPT, Perplexity, and other AI search engines can find, understand, and cite your website.', 'causabi-geo-optimizer' ); ?>
+                <?php esc_html_e( 'This score shows how easily ChatGPT, Gemini, Grok, Claude, and other AI search engines can find, understand, and cite your website.', 'causabi-geo-optimizer' ); ?>
             </p>
         </div>
         <?php
@@ -125,7 +125,7 @@ class Causabi_Admin_Page {
         $labels = [
             'robots_txt'    => [
                 __( 'robots.txt', 'causabi-geo-optimizer' ),
-                __( 'Controls whether AI crawlers like ChatGPT and Perplexity are allowed to scan your site. If blocked, they cannot read or cite your content.', 'causabi-geo-optimizer' ),
+                __( 'Controls whether AI crawlers like GPTBot, ClaudeBot, and Gemini-Bot are allowed to scan your site. If blocked, they cannot read or cite your content.', 'causabi-geo-optimizer' ),
                 20,
             ],
             'schema_org'    => [
@@ -135,7 +135,7 @@ class Causabi_Admin_Page {
             ],
             'faq_schema'    => [
                 __( 'FAQ Schema', 'causabi-geo-optimizer' ),
-                __( 'FAQ markup has been shown to increase citation rate in Perplexity and ChatGPT by up to 41%. AI engines prefer sites with clear Q&A content.', 'causabi-geo-optimizer' ),
+                __( 'FAQ markup has been shown to increase AI citation rate by up to 41%. AI engines prefer sites with clear Q&A content.', 'causabi-geo-optimizer' ),
                 20,
             ],
             'content_depth' => [
@@ -187,7 +187,7 @@ class Causabi_Admin_Page {
         }
         ?>
         <h2><?php esc_html_e( 'Issues to Fix', 'causabi-geo-optimizer' ); ?></h2>
-        <p><?php esc_html_e( 'Fixing these issues will increase how often your site appears in ChatGPT, Perplexity, and Gemini answers.', 'causabi-geo-optimizer' ); ?></p>
+        <p><?php esc_html_e( 'Fixing these issues will increase how often your site appears in ChatGPT, Gemini, Grok, and Claude answers.', 'causabi-geo-optimizer' ); ?></p>
         <ul class="causabi-issues">
             <?php foreach ( $data['issues'] as $issue ) :
                 $severity = esc_attr( $issue['severity'] ?? 'warning' );
@@ -232,7 +232,7 @@ class Causabi_Admin_Page {
             <li>✅ <strong><?php esc_html_e( 'Organization Schema', 'causabi-geo-optimizer' ); ?></strong> — <?php esc_html_e( 'tells AI your business name, website, and contact info', 'causabi-geo-optimizer' ); ?></li>
             <?php endif; ?>
             <?php if ( ! empty( $data['faq_json'] ) ) : ?>
-            <li>✅ <strong><?php esc_html_e( 'FAQ Schema', 'causabi-geo-optimizer' ); ?></strong> — <?php esc_html_e( 'boosts citation rate by up to 41% in Perplexity and ChatGPT', 'causabi-geo-optimizer' ); ?></li>
+            <li>✅ <strong><?php esc_html_e( 'FAQ Schema', 'causabi-geo-optimizer' ); ?></strong> — <?php esc_html_e( 'boosts AI citation rate by up to 41%', 'causabi-geo-optimizer' ); ?></li>
             <?php endif; ?>
             <?php if ( ! empty( $data['robots_patch'] ) ) : ?>
             <li>⚠️ <strong><?php esc_html_e( 'robots.txt patch available', 'causabi-geo-optimizer' ); ?></strong> — <?php esc_html_e( 'AI crawlers are currently blocked. Download the patch to fix this.', 'causabi-geo-optimizer' ); ?>
