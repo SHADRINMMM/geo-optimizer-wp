@@ -42,7 +42,7 @@ class Causabi_Schema_Injector {
     private function output_json_ld( array $schema ): void {
         printf(
             '<script type="application/ld+json">%s</script>' . "\n",
-            wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES )
+            wp_json_encode( $schema, JSON_UNESCAPED_UNICODE | JSON_HEX_TAG )
         );
     }
 

@@ -28,9 +28,7 @@ class Causabi_Admin_Page {
     public function register_settings(): void {
         register_setting( 'causabi_options', 'causabi_api_key', [
             'type'              => 'string',
-            'sanitize_callback' => function ( $value ) {
-                return Causabi_Crypto::encrypt( sanitize_text_field( $value ) );
-            },
+            'sanitize_callback' => 'causabi_sanitize_api_key',
             'default'           => '',
         ] );
 
@@ -49,11 +47,11 @@ class Causabi_Admin_Page {
         $stored = get_option( 'causabi_api_key', '' );
         $value  = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
         echo '<input type="text" name="causabi_api_key" value="' . esc_attr( $value ) . '" class="regular-text" placeholder="causabi_..." />';
-        echo '<p class="description">' . sprintf(
+        echo '<p class="description">' . wp_kses_post( sprintf(
             /* translators: %s: link to causabi.com */
-            esc_html__( 'Get your free API key at %s', 'causabi-geo-optimizer' ),
+            __( 'Get your free API key at %s', 'causabi-geo-optimizer' ),
             '<a href="https://causabi.com" target="_blank">causabi.com</a>'
-        ) . '</p>';
+        ) ) . '</p>';
     }
 
     public function render_page(): void {
@@ -64,7 +62,7 @@ class Causabi_Admin_Page {
         $data    = get_transient( $this->cache_key() );
         ?>
         <div class="wrap causabi-admin">
-            <h1><?php esc_html_e( 'GEO Optimizer by Causabi', 'causabi-geo-optimizer' ); ?></h1>
+            <h1><?php esc_html_e( 'Causabi GEO Optimizer', 'causabi-geo-optimizer' ); ?></h1>
             <p class="causabi-tagline"><?php esc_html_e( 'Make your website visible to ChatGPT, Gemini, Grok, Claude, and other AI search engines.', 'causabi-geo-optimizer' ); ?></p>
 
             <?php if ( $api_key && $data ) : ?>
@@ -126,7 +124,7 @@ class Causabi_Admin_Page {
             'robots_txt'    => [
                 __( 'robots.txt', 'causabi-geo-optimizer' ),
                 __( 'Controls whether AI crawlers like GPTBot, ClaudeBot, and Gemini-Bot are allowed to scan your site. If blocked, they cannot read or cite your content.', 'causabi-geo-optimizer' ),
-                20,
+                15,
             ],
             'schema_org'    => [
                 __( 'Schema.org markup', 'causabi-geo-optimizer' ),
@@ -140,7 +138,7 @@ class Causabi_Admin_Page {
             ],
             'content_depth' => [
                 __( 'Content depth', 'causabi-geo-optimizer' ),
-                __( 'AI search engines need enough text to understand what your site is about and what to quote. Thin pages are rarely cited.', 'causabi-geo-optimizer' ),
+                __( 'AI search engines need concrete text to quote: explicit prices, facts, and confident wording. Thin pages or hedged claims ("may", "possibly") are rarely cited.', 'causabi-geo-optimizer' ),
                 15,
             ],
             'brand_signals' => [
@@ -251,11 +249,11 @@ class Causabi_Admin_Page {
             <ol class="causabi-steps">
                 <li>
                     <strong><?php esc_html_e( 'Get your free API key', 'causabi-geo-optimizer' ); ?></strong><br>
-                    <?php echo sprintf(
+                    <?php echo wp_kses_post( sprintf(
                         /* translators: %s: link to causabi.com */
-                        esc_html__( 'Go to %s, sign up for free, and copy your API key.', 'causabi-geo-optimizer' ),
+                        __( 'Go to %s, sign up for free, and copy your API key.', 'causabi-geo-optimizer' ),
                         '<a href="https://causabi.com" target="_blank">causabi.com</a>'
-                    ); ?>
+                    ) ); ?>
                 </li>
                 <li>
                     <strong><?php esc_html_e( 'Paste it below and click Save', 'causabi-geo-optimizer' ); ?></strong><br>

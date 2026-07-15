@@ -1,9 +1,9 @@
-=== GEO Optimizer by Causabi ===
-Contributors: causabi
+=== Causabi GEO Optimizer ===
+Contributors: shadrinmmm
 Tags: schema, seo, ai, structured-data, ai-search
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
