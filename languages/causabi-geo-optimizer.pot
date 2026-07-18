@@ -1,8 +1,8 @@
 # Copyright (C) 2024 Causabi
-# This file is distributed under the same license as the GEO Optimizer by Causabi plugin.
+# This file is distributed under the same license as the Causabi GEO Optimizer plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: GEO Optimizer by Causabi 1.0.0\n"
+"Project-Id-Version: Causabi GEO Optimizer 1.1.2\n"
 "Report-Msgid-Bugs-To: https://causabi.com\n"
 "POT-Creation-Date: 2024-01-01T00:00:00+00:00\n"
 "MIME-Version: 1.0\n"

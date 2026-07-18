@@ -3,7 +3,7 @@ Contributors: shadrinmmm
 Tags: schema, seo, ai, structured-data, ai-search
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 1.1.1
+Stable tag: 1.1.2
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -99,6 +99,9 @@ This service is provided by Causabi. By using this plugin you agree to their [Te
 5. Onboarding — 3-step setup, no coding required
 
 == Changelog ==
+
+= 1.1.2 =
+* Renamed plugin to "Causabi GEO Optimizer" and updated slug to causabi-geo-optimizer (per WordPress.org plugin review)
 
 = 1.1.0 =
 * Smart schema.org type detection — 40+ business types (Restaurant, CafeOrCoffeeShop, BankOrCreditUnion, NewsMediaOrganization, etc.)

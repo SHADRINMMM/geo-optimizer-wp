@@ -3,7 +3,7 @@
  * Plugin Name:       Causabi GEO Optimizer
  * Plugin URI:        https://causabi.com/for-wordpress
  * Description:       Make your website visible to ChatGPT, Gemini, Grok, Claude, and other AI search engines. Automatically adds Schema.org markup and shows your AI Readiness Score in the dashboard.
- * Version:           1.1.1
+ * Version:           1.1.2
  * Requires at least: 5.8
  * Requires PHP:      8.1
  * Author:            Causabi
@@ -16,7 +16,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'CAUSABI_VERSION',    '1.1.1' );
+define( 'CAUSABI_VERSION',    '1.1.2' );
 define( 'CAUSABI_API_URL',    'https://ai.causabi.com' );
 define( 'CAUSABI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CAUSABI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
