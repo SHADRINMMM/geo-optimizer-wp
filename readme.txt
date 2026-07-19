@@ -22,6 +22,8 @@ GEO Optimizer analyzes your site and automatically injects the markup that AI en
 
 * ✅ Adds **smart Schema.org markup** — correct type per business (Restaurant, CafeOrCoffeeShop, BankOrCreditUnion, and 40+ more), not just generic "Organization"
 * ✅ Adds **FAQ Schema** — research shows this boosts AI citation rate by up to **41%**
+* ✅ Serves a **llms.txt** file — a plain-text summary of your site for AI agents that support it
+* ✅ Checks your **robots.txt** for AI crawlers being blocked and can add explicit Allow rules for them
 * ✅ **Language-aware AI analysis** — RU sites get Russian FAQ and markup, EN sites get English
 * ✅ Shows your **AI Readiness Score** (0–100) with a full breakdown
 * ✅ Identifies exactly which issues are hurting your AI visibility
@@ -99,6 +101,11 @@ This service is provided by Causabi. By using this plugin you agree to their [Te
 5. Onboarding — 3-step setup, no coding required
 
 == Changelog ==
+
+= 1.2.0 =
+* Added llms.txt support — serves a plain-text summary of your site at /llms.txt, refreshed every 7 days along with your Schema.org markup
+* Added a robots.txt check that warns if AI crawlers (GPTBot, ClaudeBot, PerplexityBot, and others) are blocked, with an option to add explicit Allow rules
+* Both features can be toggled off in Settings → GEO Optimizer
 
 = 1.1.2 =
 * Renamed plugin to "Causabi GEO Optimizer" and updated slug to causabi-geo-optimizer (per WordPress.org plugin review)
