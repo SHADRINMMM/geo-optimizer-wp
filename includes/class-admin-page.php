@@ -31,6 +31,16 @@ class Causabi_Admin_Page {
             'sanitize_callback' => 'causabi_sanitize_api_key',
             'default'           => '',
         ] );
+        register_setting( 'causabi_options', 'causabi_llms_txt_enabled', [
+            'type'              => 'string',
+            'sanitize_callback' => [ $this, 'sanitize_checkbox' ],
+            'default'           => '1',
+        ] );
+        register_setting( 'causabi_options', 'causabi_ai_bots_enabled', [
+            'type'              => 'string',
+            'sanitize_callback' => [ $this, 'sanitize_checkbox' ],
+            'default'           => '1',
+        ] );
 
         add_settings_section( 'causabi_main', '', '__return_false', 'causabi-geo-optimizer' );
 
@@ -41,6 +51,25 @@ class Causabi_Admin_Page {
             'causabi-geo-optimizer',
             'causabi_main'
         );
+        add_settings_field(
+            'causabi_llms_txt_field',
+            __( 'llms.txt', 'causabi-geo-optimizer' ),
+            [ $this, 'render_llms_txt_field' ],
+            'causabi-geo-optimizer',
+            'causabi_main'
+        );
+        add_settings_field(
+            'causabi_ai_bots_field',
+            __( 'AI crawlers in robots.txt', 'causabi-geo-optimizer' ),
+            [ $this, 'render_ai_bots_field' ],
+            'causabi-geo-optimizer',
+            'causabi_main'
+        );
+    }
+
+    // Checkboxes only POST a value when checked — normalize to '1' / '0'.
+    public function sanitize_checkbox( $value ): string {
+        return '1' === $value ? '1' : '0';
     }
 
     public function render_api_key_field(): void {
@@ -52,6 +81,41 @@ class Causabi_Admin_Page {
             __( 'Get your free API key at %s', 'causabi-geo-optimizer' ),
             '<a href="https://causabi.com" target="_blank">causabi.com</a>'
         ) ) . '</p>';
+    }
+
+    public function render_llms_txt_field(): void {
+        $enabled = '1' === get_option( 'causabi_llms_txt_enabled', '1' );
+        echo '<label><input type="checkbox" name="causabi_llms_txt_enabled" value="1"' . checked( $enabled, true, false ) . ' /> ';
+        esc_html_e( 'Serve /llms.txt for AI agents', 'causabi-geo-optimizer' );
+        echo '</label>';
+        echo '<p class="description">' . esc_html__( 'A plain-text summary of your site, generated automatically and refreshed every 7 days. Read by AI agents and research tools that support llms.txt — not all of them do yet.', 'causabi-geo-optimizer' ) . '</p>';
+
+        $llms_txt = new Causabi_Llms_Txt();
+        if ( $llms_txt->physical_file_exists() ) {
+            echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'A physical llms.txt file already exists in your site root. Your web server will serve that file directly — this setting has no effect until it is removed.', 'causabi-geo-optimizer' ) . '</p></div>';
+        }
+    }
+
+    public function render_ai_bots_field(): void {
+        $enabled = '1' === get_option( 'causabi_ai_bots_enabled', '1' );
+        echo '<label><input type="checkbox" name="causabi_ai_bots_enabled" value="1"' . checked( $enabled, true, false ) . ' /> ';
+        esc_html_e( 'Explicitly allow AI crawlers (GPTBot, ClaudeBot, PerplexityBot, and others) in robots.txt', 'causabi-geo-optimizer' );
+        echo '</label>';
+        echo '<p class="description">' . esc_html__( 'Adds Allow rules to your robots.txt so AI search engines are not accidentally blocked from reading your site.', 'causabi-geo-optimizer' ) . '</p>';
+
+        $robots = new Causabi_Robots();
+        if ( $robots->physical_file_exists() ) {
+            echo '<div class="notice notice-warning inline"><p>' . esc_html__( 'A physical robots.txt file exists in your site root. WordPress cannot modify it — this setting has no effect. Check that file manually for Disallow rules blocking AI crawlers.', 'causabi-geo-optimizer' ) . '</p></div>';
+        } else {
+            $blocked = $robots->find_blocking_rules();
+            if ( $blocked ) {
+                echo '<div class="notice notice-warning inline"><p>' . esc_html( sprintf(
+                    /* translators: %s: comma-separated list of blocked bot names */
+                    __( 'Your robots.txt currently blocks: %s. Review your SEO plugin settings if this is unintentional.', 'causabi-geo-optimizer' ),
+                    implode( ', ', $blocked )
+                ) ) . '</p></div>';
+            }
+        }
     }
 
     public function render_page(): void {
@@ -213,7 +277,7 @@ class Causabi_Admin_Page {
             <?php
             printf(
                 /* translators: %s: scan timestamp */
-                esc_html__( 'Last scan: %s. Auto-refreshes every 7 days.', 'causabi-geo-optimizer' ),
+                esc_html__( 'Last update to Schema.org markup and llms.txt: %s. Auto-refreshes every 7 days.', 'causabi-geo-optimizer' ),
                 esc_html( $scanned )
             );
             ?>
@@ -231,6 +295,9 @@ class Causabi_Admin_Page {
             <?php endif; ?>
             <?php if ( ! empty( $data['faq_json'] ) ) : ?>
             <li>✅ <strong><?php esc_html_e( 'FAQ Schema', 'causabi-geo-optimizer' ); ?></strong> — <?php esc_html_e( 'boosts AI citation rate by up to 41%', 'causabi-geo-optimizer' ); ?></li>
+            <?php endif; ?>
+            <?php if ( ! empty( $data['llms_txt'] ) && '1' === get_option( 'causabi_llms_txt_enabled', '1' ) ) : ?>
+            <li>✅ <strong><a href="<?php echo esc_url( home_url( '/llms.txt' ) ); ?>" target="_blank">llms.txt</a></strong> — <?php esc_html_e( 'plain-text site summary for AI agents that support it', 'causabi-geo-optimizer' ); ?></li>
             <?php endif; ?>
             <?php if ( ! empty( $data['robots_patch'] ) ) : ?>
             <li>⚠️ <strong><?php esc_html_e( 'robots.txt patch available', 'causabi-geo-optimizer' ); ?></strong> — <?php esc_html_e( 'AI crawlers are currently blocked. Download the patch to fix this.', 'causabi-geo-optimizer' ); ?>
