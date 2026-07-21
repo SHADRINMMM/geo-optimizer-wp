@@ -24,8 +24,20 @@ class Causabi_Llms_Txt {
         return $vars;
     }
 
-    public function maybe_serve( \WP_Query $wp_query ): void {
-        if ( ! $wp_query->is_main_query() || empty( $wp_query->get( self::QUERY_VAR ) ) ) {
+    /**
+     * Cancels the canonical trailing-slash redirect for /llms.txt —
+     * without this WP 301s the request to /llms.txt/ before we can serve it.
+     */
+    public function cancel_canonical_redirect( $redirect_url ) {
+        if ( get_query_var( self::QUERY_VAR ) ) {
+            return false;
+        }
+        return $redirect_url;
+    }
+
+    public function maybe_serve(): void {
+        // template_redirect passes no arguments — read the main query directly.
+        if ( empty( get_query_var( self::QUERY_VAR ) ) ) {
             return;
         }
 

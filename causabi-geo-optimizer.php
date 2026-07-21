@@ -52,7 +52,8 @@ add_action( 'init', 'causabi_init' );
 $causabi_llms_txt = new Causabi_Llms_Txt();
 add_action( 'init',              [ $causabi_llms_txt, 'add_rewrite_rule' ] );
 add_filter( 'query_vars',        [ $causabi_llms_txt, 'add_query_var' ] );
-add_action( 'template_redirect', [ $causabi_llms_txt, 'maybe_serve' ] );
+add_filter( 'redirect_canonical', [ $causabi_llms_txt, 'cancel_canonical_redirect' ] );
+add_action( 'template_redirect',  [ $causabi_llms_txt, 'maybe_serve' ], 0 );
 
 // robots.txt — allow AI crawlers on the virtual robots.txt WordPress generates
 $causabi_robots = new Causabi_Robots();
