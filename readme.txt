@@ -3,7 +3,7 @@ Contributors: shadrinmmm
 Tags: schema, seo, chatgpt, structured-data, ai-search
 Requires at least: 5.8
 Tested up to: 7.0
-Stable tag: 1.2.0
+Stable tag: 1.2.1
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -101,6 +101,9 @@ This service is provided by Causabi. By using this plugin you agree to their [Te
 5. Onboarding — 3-step setup, no coding required
 
 == Changelog ==
+
+= 1.2.1 =
+* Added an optional in-dashboard reminder to leave a review (appears once, a week after setup, and only after your site has a score)
 
 = 1.2.0 =
 * Added llms.txt support — serves a plain-text summary of your site at /llms.txt, refreshed every 7 days along with your Schema.org markup

@@ -3,7 +3,7 @@
  * Plugin Name:       Causabi GEO Optimizer
  * Plugin URI:        https://causabi.com/for-wordpress
  * Description:       Make your website visible to ChatGPT, Gemini, Grok, Claude, and other AI search engines. Automatically adds Schema.org markup and shows your AI Readiness Score in the dashboard.
- * Version:           1.2.0
+ * Version:           1.2.1
  * Requires at least: 5.8
  * Requires PHP:      8.1
  * Author:            Causabi
@@ -16,7 +16,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-define( 'CAUSABI_VERSION',    '1.2.0' );
+define( 'CAUSABI_VERSION',    '1.2.1' );
 define( 'CAUSABI_API_URL',    'https://ai.causabi.com' );
 define( 'CAUSABI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'CAUSABI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
@@ -28,6 +28,7 @@ require_once CAUSABI_PLUGIN_DIR . 'includes/class-llms-txt.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-robots.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-admin-page.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-dashboard-widget.php';
+require_once CAUSABI_PLUGIN_DIR . 'includes/class-review-notice.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-cron.php';
 
 // Sanitize API key for register_setting — encrypt as-is (sanitize_text_field
@@ -69,6 +70,10 @@ if ( is_admin() ) {
     $causabi_widget = new Causabi_Dashboard_Widget();
     add_action( 'wp_dashboard_setup',    [ $causabi_widget, 'register' ] );
     add_action( 'admin_enqueue_scripts', [ $causabi_widget, 'enqueue_styles' ] );
+
+    $causabi_review = new Causabi_Review_Notice();
+    add_action( 'admin_notices', [ $causabi_review, 'maybe_show' ] );
+    add_action( 'admin_init',    [ $causabi_review, 'handle_action' ] );
 }
 
 // AJAX handler fires on admin-ajax.php — available even outside is_admin() block
@@ -81,6 +86,9 @@ add_action( 'wp_ajax_causabi_refresh', 'causabi_ajax_refresh' );
 register_activation_hook(   __FILE__, [ 'Causabi_Cron', 'schedule' ] );
 register_deactivation_hook( __FILE__, [ 'Causabi_Cron', 'unschedule' ] );
 add_action( 'causabi_refresh_schema', [ 'Causabi_Cron', 'refresh' ] );
+
+// Record activation time — the review nudge waits a week before asking
+register_activation_hook( __FILE__, [ 'Causabi_Review_Notice', 'record_activation' ] );
 
 // /llms.txt rewrite rule needs a flush on (de)activation to take effect
 register_activation_hook(   __FILE__, 'flush_rewrite_rules' );
