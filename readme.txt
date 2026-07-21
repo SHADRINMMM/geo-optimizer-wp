@@ -1,6 +1,6 @@
 === Causabi GEO Optimizer ===
 Contributors: shadrinmmm
-Tags: schema, seo, ai, structured-data, ai-search
+Tags: schema, seo, chatgpt, structured-data, ai-search
 Requires at least: 5.8
 Tested up to: 7.0
 Stable tag: 1.2.0
@@ -8,27 +8,27 @@ Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Make your website visible to ChatGPT, Gemini, Grok, Claude, and other AI search engines — automatically.
+AI SEO for WordPress: make your site visible to ChatGPT, Gemini, Grok, Claude, and Google AI Overviews.
 
 == Description ==
 
-**73% of websites are invisible to AI search engines.** This plugin fixes that in minutes — no coding required.
+**Your site might be invisible to AI search — and nothing tells you.** This plugin shows you where you stand, then fixes it in minutes. No coding.
 
-When someone asks ChatGPT, Gemini, or Grok a question, the AI picks websites to cite from. If your site is missing the right structured data, it gets skipped — even if your content is great.
+When someone asks ChatGPT, Perplexity, or Google's AI a question your business could answer, the AI picks which sites to cite from machine-readable signals — Schema.org structured data, an llms.txt file, a robots.txt that doesn't block the AI crawlers. If those are missing, you get skipped, no matter how good your content is.
 
-GEO Optimizer analyzes your site and automatically injects the markup that AI engines look for:
+Causabi GEO Optimizer scans your site, scores it, and adds the markup AI engines look for — automatically.
 
 **What it does:**
 
-* ✅ Adds **smart Schema.org markup** — correct type per business (Restaurant, CafeOrCoffeeShop, BankOrCreditUnion, and 40+ more), not just generic "Organization"
-* ✅ Adds **FAQ Schema** — research shows this boosts AI citation rate by up to **41%**
-* ✅ Serves a **llms.txt** file — a plain-text summary of your site for AI agents that support it
-* ✅ Checks your **robots.txt** for AI crawlers being blocked and can add explicit Allow rules for them
-* ✅ **Language-aware AI analysis** — RU sites get Russian FAQ and markup, EN sites get English
-* ✅ Shows your **AI Readiness Score** (0–100) with a full breakdown
-* ✅ Identifies exactly which issues are hurting your AI visibility
-* ✅ Auto-refreshes your markup every 7 days to stay current
-* ✅ **No coding required** — works out of the box
+* Adds **smart Schema.org markup (structured data)** — the correct type per business (Restaurant, CafeOrCoffeeShop, BankOrCreditUnion, and 40+ more), not just a generic "Organization"
+* Adds **FAQ Schema** — research shows FAQ markup can raise AI citation rate by up to **41%**
+* Serves an **llms.txt** file — a plain-text summary of your site for AI agents that read it
+* Checks your **robots.txt** for blocked AI crawlers (GPTBot, ClaudeBot, PerplexityBot, and more) and can add explicit Allow rules
+* **Language-aware** — your FAQ and markup are generated in your site's own language
+* Shows your **AI Readiness Score** (0–100) with a full breakdown by category
+* Tells you exactly which issues are hurting your AI visibility, and why
+* Auto-refreshes your markup every 7 days so it stays current
+* **No coding required** — works out of the box
 
 **How it works:**
 
