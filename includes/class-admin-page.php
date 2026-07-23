@@ -73,8 +73,7 @@ class Causabi_Admin_Page {
     }
 
     public function render_api_key_field(): void {
-        $stored = get_option( 'causabi_api_key', '' );
-        $value  = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
+        $value = Causabi_Crypto::get_api_key();
         echo '<input type="text" name="causabi_api_key" value="' . esc_attr( $value ) . '" class="regular-text" placeholder="causabi_..." />';
         echo '<p class="description">' . wp_kses_post( sprintf(
             /* translators: %s: link to causabi.com */
@@ -121,8 +120,7 @@ class Causabi_Admin_Page {
     public function render_page(): void {
         if ( ! current_user_can( 'manage_options' ) ) return;
 
-        $stored  = get_option( 'causabi_api_key', '' );
-        $api_key = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
+        $api_key = Causabi_Crypto::get_api_key();
         $data    = get_transient( $this->cache_key() );
         ?>
         <div class="wrap causabi-admin">
@@ -139,10 +137,20 @@ class Causabi_Admin_Page {
 
             <?php elseif ( $api_key ) : ?>
 
-                <div class="notice notice-info inline">
-                    <p><?php esc_html_e( 'Analyzing your website for the first time — this may take up to 30 seconds. Reload this page in a moment.', 'causabi-geo-optimizer' ); ?></p>
-                </div>
-                <?php $this->trigger_first_scan( $api_key ); ?>
+                <?php if ( $this->trigger_first_scan( $api_key ) ) : ?>
+
+                    <div class="notice notice-info inline">
+                        <p><?php esc_html_e( 'Analyzing your website for the first time — this may take up to 30 seconds. Reload this page in a moment.', 'causabi-geo-optimizer' ); ?></p>
+                    </div>
+
+                <?php else : ?>
+
+                    <div class="notice notice-error inline">
+                        <p><?php esc_html_e( 'Could not reach the Causabi API to scan your site. This can be a temporary network issue, or your API key may be invalid.', 'causabi-geo-optimizer' ); ?></p>
+                        <p><a href="<?php echo esc_url( admin_url( 'options-general.php?page=causabi-geo-optimizer' ) ); ?>" class="button"><?php esc_html_e( 'Try again', 'causabi-geo-optimizer' ); ?></a></p>
+                    </div>
+
+                <?php endif; ?>
 
             <?php else : ?>
 
@@ -335,17 +343,25 @@ class Causabi_Admin_Page {
         <?php
     }
 
-    private function trigger_first_scan( string $api_key ): void {
-        // Fire a background analysis so the page shows data on next reload
-        if ( ! get_transient( 'causabi_scan_queued' ) ) {
-            set_transient( 'causabi_scan_queued', 1, HOUR_IN_SECONDS );
-            $domain = str_replace( 'www.', '', strtolower( wp_parse_url( get_site_url(), PHP_URL_HOST ) ?? '' ) );
-            $client = new Causabi_API_Client( $api_key );
-            $data   = $client->analyze( get_site_url(), $domain );
-            if ( $data ) {
-                set_transient( 'causabi_data_' . md5( $domain ), $data, DAY_IN_SECONDS );
-            }
+    // Returns true if a scan is in flight or just succeeded (show "Analyzing...").
+    // Returns false if the scan just failed (show the error notice + retry link) —
+    // the transient lock is released immediately so the retry link works right away
+    // instead of forcing the user to wait out the full hour-long lock (MAJOR-1 fix).
+    private function trigger_first_scan( string $api_key ): bool {
+        if ( get_transient( 'causabi_scan_queued' ) ) return true;
+
+        set_transient( 'causabi_scan_queued', 1, HOUR_IN_SECONDS );
+        $domain = str_replace( 'www.', '', strtolower( wp_parse_url( get_site_url(), PHP_URL_HOST ) ?? '' ) );
+        $client = new Causabi_API_Client( $api_key );
+        $data   = $client->analyze( get_site_url(), $domain );
+
+        if ( ! $data ) {
+            delete_transient( 'causabi_scan_queued' );
+            return false;
         }
+
+        set_transient( 'causabi_data_' . md5( $domain ), $data, DAY_IN_SECONDS );
+        return true;
     }
 
     public function ajax_refresh(): void {
@@ -361,8 +377,7 @@ class Causabi_Admin_Page {
         }
         set_transient( $lock_key, 1, 60 );
 
-        $stored  = get_option( 'causabi_api_key', '' );
-        $api_key = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
+        $api_key = Causabi_Crypto::get_api_key();
         if ( ! $api_key ) {
             delete_transient( $lock_key );
             wp_send_json_error( 'API key not configured' );

@@ -39,8 +39,7 @@ function causabi_sanitize_api_key( string $value ): string {
 
 // Inject Schema.org into <head> on every page load
 function causabi_init(): void {
-    $stored  = get_option( 'causabi_api_key', '' );
-    $api_key = ! empty( $stored ) ? Causabi_Crypto::decrypt( $stored ) : '';
+    $api_key = Causabi_Crypto::get_api_key();
     if ( ! $api_key ) return;
 
     $injector = new Causabi_Schema_Injector( $api_key );
