@@ -1,18 +1,18 @@
 === Causabi GEO Optimizer ===
 Contributors: shadrinmmm
-Tags: schema, seo, chatgpt, structured-data, ai-search
+Tags: schema, seo, chatgpt, ai-search, ai-visibility
 Requires at least: 5.8
-Tested up to: 7.0
-Stable tag: 1.2.1
+Tested up to: 7.0.2
+Stable tag: 1.2.2
 Requires PHP: 8.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-AI SEO for WordPress: make your site visible to ChatGPT, Gemini, Grok, Claude, and Google AI Overviews.
+Check and fix your AI search visibility: schema markup, llms.txt, and robots.txt for ChatGPT, Gemini, Claude, and Google AI Overviews.
 
 == Description ==
 
-**Your site might be invisible to AI search — and nothing tells you.** This plugin shows you where you stand, then fixes it in minutes. No coding.
+**Is your site invisible to ChatGPT and AI search? Find out, then fix it in minutes.** This plugin checks your site the way AI engines do, then adds what's missing. No coding.
 
 When someone asks ChatGPT, Perplexity, or Google's AI a question your business could answer, the AI picks which sites to cite from machine-readable signals — Schema.org structured data, an llms.txt file, a robots.txt that doesn't block the AI crawlers. If those are missing, you get skipped, no matter how good your content is.
 
@@ -37,9 +37,7 @@ Causabi GEO Optimizer scans your site, scores it, and adds the markup AI engines
 3. The markup is automatically added to every page on your site
 4. You see your AI Readiness Score and a list of issues to fix
 
-**What is GEO?**
-
-GEO (Generative Engine Optimization) is the practice of optimizing your website so that AI search engines like ChatGPT, Gemini, Grok, and Google's AI Overview cite your content in their answers. It's like SEO, but for the AI era.
+**AI search is part of SEO now.** ChatGPT, Gemini, Grok, and Google's AI Overview all read the same machine-readable signals — Schema.org, llms.txt, robots.txt — that this plugin manages. Think of it as the AI-visibility layer of your existing SEO, not a separate discipline.
 
 **Free to use.** Get your API key at [causabi.com](https://causabi.com).
 
@@ -65,9 +63,9 @@ No. The Schema.org markup is cached for 24 hours and served from WordPress Trans
 
 Schema.org is a standard way to describe your website to search engines and AI. It's added as a hidden `<script type="application/ld+json">` tag in your page's `<head>`. It doesn't change how your site looks — only how AI and search engines understand it.
 
-= Is this plugin free? =
+= Is this plugin free? What's paid? =
 
-Yes — the plugin and basic API key are free. Advanced features like FAQ generation via AI and citation monitoring are available on paid plans at causabi.com.
+The plugin itself is 100% free — Schema.org markup, llms.txt, robots.txt checks, and the auto-refresh every 7 days all work on the free API key, no time limit. What's paid (on causabi.com, not required to use this plugin) is the cloud dashboard: AI-generated FAQ content tailored to your business, citation monitoring across ChatGPT/Gemini/Grok, and done-for-you fixes if you'd rather not touch settings yourself.
 
 = How is this different from other Schema plugins? =
 
@@ -101,6 +99,10 @@ This service is provided by Causabi. By using this plugin you agree to their [Te
 5. Onboarding — 3-step setup, no coding required
 
 == Changelog ==
+
+= 1.2.2 =
+* Fixed: on first-ever save, the API key could be encrypted twice due to a WordPress core quirk (`update_option` re-running the sanitize callback), leaving it permanently unusable. The plugin now detects and repairs already-affected installs automatically — no action needed.
+* Fixed: if the initial site scan failed (network issue or invalid key), the plugin used to silently show "Analyzing..." for up to an hour with no way to retry. It now shows a clear error message with a retry link right away.
 
 = 1.2.1 =
 * Added an optional in-dashboard reminder to leave a review (appears once, a week after setup, and only after your site has a score)
