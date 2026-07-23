@@ -25,6 +25,7 @@ require_once CAUSABI_PLUGIN_DIR . 'includes/class-crypto.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-api-client.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-schema-injector.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-llms-txt.php';
+require_once CAUSABI_PLUGIN_DIR . 'includes/class-challenge.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-robots.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-admin-page.php';
 require_once CAUSABI_PLUGIN_DIR . 'includes/class-dashboard-widget.php';
@@ -54,6 +55,15 @@ add_action( 'init',              [ $causabi_llms_txt, 'add_rewrite_rule' ] );
 add_filter( 'query_vars',        [ $causabi_llms_txt, 'add_query_var' ] );
 add_filter( 'redirect_canonical', [ $causabi_llms_txt, 'cancel_canonical_redirect' ] );
 add_action( 'template_redirect',  [ $causabi_llms_txt, 'maybe_serve' ], 0 );
+
+// Virtual /.well-known/causabi-challenge — one-button provision proof of
+// domain control (wp-one-button-plan-2026-07-23.md §1), same virtual-file
+// pattern as /llms.txt above.
+$causabi_challenge = new Causabi_Challenge();
+add_action( 'init',              [ $causabi_challenge, 'add_rewrite_rule' ] );
+add_filter( 'query_vars',        [ $causabi_challenge, 'add_query_var' ] );
+add_filter( 'redirect_canonical', [ $causabi_challenge, 'cancel_canonical_redirect' ] );
+add_action( 'template_redirect',  [ $causabi_challenge, 'maybe_serve' ], 0 );
 
 // robots.txt — allow AI crawlers on the virtual robots.txt WordPress generates
 $causabi_robots = new Causabi_Robots();

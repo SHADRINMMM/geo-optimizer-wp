@@ -121,7 +121,17 @@ class Causabi_Admin_Page {
         if ( ! current_user_can( 'manage_options' ) ) return;
 
         $api_key = Causabi_Crypto::get_api_key();
-        $data    = get_transient( $this->cache_key() );
+
+        // Lazy auto-provision (plan §4): NOT on activation hook (would
+        // stampede the backend on a bulk-install/featured-listing spike —
+        // plan §risk 2) — only when an admin actually opens this page and
+        // no key exists yet ("uses" the one real page-load a fresh install
+        // gets, spreading load out naturally instead of bursting it).
+        if ( ! $api_key ) {
+            $api_key = $this->maybe_auto_provision();
+        }
+
+        $data = $api_key ? get_transient( $this->cache_key() ) : false;
         ?>
         <div class="wrap causabi-admin">
             <h1><?php esc_html_e( 'Causabi GEO Optimizer', 'causabi-geo-optimizer' ); ?></h1>
@@ -134,13 +144,14 @@ class Causabi_Admin_Page {
                 <?php $this->render_issues( $data ); ?>
                 <?php $this->render_refresh_button( $data ); ?>
                 <?php $this->render_what_was_added( $data ); ?>
+                <?php $this->render_claim_upsell(); ?>
 
             <?php elseif ( $api_key ) : ?>
 
                 <?php if ( $this->trigger_first_scan( $api_key ) ) : ?>
 
                     <div class="notice notice-info inline">
-                        <p><?php esc_html_e( 'Analyzing your website for the first time — this may take up to 30 seconds. Reload this page in a moment.', 'causabi-geo-optimizer' ); ?></p>
+                        <p><?php esc_html_e( 'Scanning your site now — this updates automatically, no need to reload.', 'causabi-geo-optimizer' ); ?></p>
                     </div>
 
                 <?php else : ?>
@@ -152,9 +163,17 @@ class Causabi_Admin_Page {
 
                 <?php endif; ?>
 
+            <?php elseif ( $this->provision_in_progress() ) : ?>
+
+                <div class="notice notice-info inline">
+                    <p><?php esc_html_e( 'Setting up your free scan — reload this page in a moment.', 'causabi-geo-optimizer' ); ?></p>
+                </div>
+                <?php $this->render_manual_key_option(); ?>
+
             <?php else : ?>
 
                 <?php $this->render_onboarding(); ?>
+                <?php $this->render_manual_key_option(); ?>
 
             <?php endif; ?>
 
@@ -319,28 +338,102 @@ class Causabi_Admin_Page {
     private function render_onboarding(): void {
         ?>
         <div class="causabi-onboarding">
-            <h2><?php esc_html_e( 'Get Started in 2 Minutes', 'causabi-geo-optimizer' ); ?></h2>
-            <p><?php esc_html_e( '73% of websites are invisible to AI search engines. This plugin fixes that automatically — no coding required.', 'causabi-geo-optimizer' ); ?></p>
-            <ol class="causabi-steps">
-                <li>
-                    <strong><?php esc_html_e( 'Get your free API key', 'causabi-geo-optimizer' ); ?></strong><br>
-                    <?php echo wp_kses_post( sprintf(
-                        /* translators: %s: link to causabi.com */
-                        __( 'Go to %s, sign up for free, and copy your API key.', 'causabi-geo-optimizer' ),
-                        '<a href="https://causabi.com" target="_blank">causabi.com</a>'
-                    ) ); ?>
-                </li>
-                <li>
-                    <strong><?php esc_html_e( 'Paste it below and click Save', 'causabi-geo-optimizer' ); ?></strong><br>
-                    <?php esc_html_e( 'We will analyze your site and add Schema.org markup automatically.', 'causabi-geo-optimizer' ); ?>
-                </li>
-                <li>
-                    <strong><?php esc_html_e( 'See your AI Readiness Score', 'causabi-geo-optimizer' ); ?></strong><br>
-                    <?php esc_html_e( 'Your score and detailed report will appear right here within 30 seconds.', 'causabi-geo-optimizer' ); ?>
-                </li>
-            </ol>
+            <h2><?php esc_html_e( 'Setting Up Your Free Scan', 'causabi-geo-optimizer' ); ?></h2>
+            <p><?php esc_html_e( '73% of websites are invisible to AI search engines. We could not reach the Causabi API just now to set up your scan automatically — reload this page to retry, or connect manually below.', 'causabi-geo-optimizer' ); ?></p>
         </div>
         <?php
+    }
+
+    /**
+     * "Already have a key" fallback (plan §4): the mandatory paste-key
+     * step becomes optional — only surfaced when auto-provision hasn't
+     * produced a key yet (in progress, failed, or not attempted).
+     */
+    private function render_manual_key_option(): void {
+        ?>
+        <p class="causabi-manual-key-toggle">
+            <a href="#" onclick="document.getElementById('causabi-manual-key').style.display='block';this.style.display='none';return false;">
+                <?php esc_html_e( 'Already have an account? Enter your API key', 'causabi-geo-optimizer' ); ?>
+            </a>
+        </p>
+        <div id="causabi-manual-key" style="display:none;">
+            <form method="post" action="options.php">
+                <?php
+                settings_fields( 'causabi_options' );
+                echo '<p>';
+                $this->render_api_key_field();
+                echo '</p>';
+                submit_button( __( 'Connect', 'causabi-geo-optimizer' ) );
+                ?>
+            </form>
+        </div>
+        <?php
+    }
+
+    /**
+     * Post-score upsell (plan §4, spec 22.07: never show the account pitch
+     * before the first result). Honest framing
+     * ([[feedback-honesty-absolute]], no "GEO"/"visible to AI" claims here
+     * — those belong to the score itself, not to the account pitch):
+     * the scan and files already work without an account; an account only
+     * adds history + change alerts.
+     */
+    private function render_claim_upsell(): void {
+        $host = wp_parse_url( get_site_url(), PHP_URL_HOST ) ?? '';
+        $domain = str_replace( 'www.', '', strtolower( $host ) );
+        $signup_url = add_query_arg( 'claim_domain', rawurlencode( $domain ), CAUSABI_API_URL . '/signup' );
+        ?>
+        <div class="notice notice-info inline causabi-claim-upsell">
+            <p>
+                <?php esc_html_e( 'Scan and files work without an account. Create a free account to save your scan history and get notified when something changes.', 'causabi-geo-optimizer' ); ?>
+                <a href="<?php echo esc_url( $signup_url ); ?>" target="_blank"><?php esc_html_e( 'Save my history', 'causabi-geo-optimizer' ); ?></a>
+            </p>
+        </div>
+        <?php
+    }
+
+    /**
+     * True while an auto-provision attempt has been queued this hour but
+     * hasn't produced a key yet — same shape as trigger_first_scan's lock
+     * (MAJOR-1 pattern: released immediately on failure so retry isn't
+     * stuck behind the full lock duration).
+     */
+    private function provision_in_progress(): bool {
+        return (bool) get_transient( 'causabi_provision_queued' );
+    }
+
+    /**
+     * Runs the full provision -> publish challenge -> verify round trip
+     * (plan §1) inside a single page render. Returns the new API key on
+     * success, empty string on any failure (challenge issuance, site
+     * unreachable, verify mismatch) — caller falls back to the manual-key
+     * form, same MAJOR-1-style "don't lock silently" posture as the
+     * scan-lock below.
+     */
+    private function maybe_auto_provision(): string {
+        if ( get_transient( 'causabi_provision_queued' ) ) return '';
+        set_transient( 'causabi_provision_queued', 1, HOUR_IN_SECONDS );
+
+        $site_url = get_site_url();
+        $client   = new Causabi_API_Client();
+        $token    = $client->provision( $site_url );
+        if ( ! $token ) {
+            delete_transient( 'causabi_provision_queued' );
+            return '';
+        }
+
+        ( new Causabi_Challenge() )->store_token( $token );
+
+        $key = $client->provision_verify( $site_url );
+        if ( ! $key ) {
+            delete_transient( 'causabi_provision_queued' );
+            return '';
+        }
+
+        update_option( 'causabi_api_key', Causabi_Crypto::encrypt( $key ) );
+        ( new Causabi_Challenge() )->clear_token();
+        delete_transient( 'causabi_provision_queued' );
+        return $key;
     }
 
     // Returns true if a scan is in flight or just succeeded (show "Analyzing...").
@@ -356,6 +449,15 @@ class Causabi_Admin_Page {
         $data   = $client->analyze( get_site_url(), $domain );
 
         if ( ! $data ) {
+            // Domain-mismatch (plan §risk 3): this keyless key was scoped
+            // to a domain this install no longer answers to (site moved,
+            // staging->prod clone, multisite). Re-provisioning under the
+            // CURRENT domain replaces the stale key so the next page load
+            // (not this one — same MAJOR-1 "don't retry-loop synchronously"
+            // posture) picks it up and scans cleanly.
+            if ( 403 === $client->last_status_code() ) {
+                delete_option( 'causabi_api_key' );
+            }
             delete_transient( 'causabi_scan_queued' );
             return false;
         }
@@ -391,6 +493,11 @@ class Causabi_Admin_Page {
         $data   = $client->analyze( get_site_url(), $domain );
 
         if ( ! $data ) {
+            // Domain-mismatch (plan §risk 3) — same re-provision-on-next-load
+            // posture as trigger_first_scan() above.
+            if ( 403 === $client->last_status_code() ) {
+                delete_option( 'causabi_api_key' );
+            }
             delete_transient( $lock_key );
             wp_send_json_error( 'Could not reach Causabi API. Please try again.' );
         }
